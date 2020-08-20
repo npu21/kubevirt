@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 #
 # This file is part of the KubeVirt project
 #
@@ -17,9 +16,24 @@
 # Copyright 2017 Red Hat, Inc.
 #
 
-set -e
+FROM kubevirt/libvirt:4.9.0
 
-source hack/common.sh
-source hack/config.sh
+LABEL maintainer="The KubeVirt Project <kubevirt-dev@googlegroups.com>"
 
-build_func_tests
+RUN dnf -y install \
+  edk2-ovmf \
+  socat \
+  genisoimage \
+  && dnf -y clean all && \
+  test $(id -u qemu) = 107 # make sure that the qemu user really is 107
+
+COPY virt-launcher /usr/bin/virt-launcher
+COPY .version /.version
+
+# Allow qemu to bind privileged ports
+RUN setcap CAP_NET_BIND_SERVICE=+eip /usr/bin/qemu-system-x86_64
+
+RUN mkdir -p /usr/share/kubevirt/virt-launcher
+COPY sock-connector /usr/share/kubevirt/virt-launcher/
+
+ENTRYPOINT [ "/usr/bin/virt-launcher" ]

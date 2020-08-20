@@ -1,4 +1,3 @@
-#!/bin/bash
 #
 # This file is part of the KubeVirt project
 #
@@ -14,22 +13,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Copyright 2019 Red Hat, Inc.
+# Copyright 2017 Red Hat, Inc.
 #
 
-set -e
+FROM fedora:28
 
-source hack/common.sh
-source hack/config.sh
+LABEL maintainer="The KubeVirt Project <kubevirt-dev@googlegroups.com>"
 
-shfmt -i 4 -w ${KUBEVIRT_DIR}/hack/ ${KUBEVIRT_DIR}/images/
-bazel run \
-    --config=${ARCHITECTURE} \
-    //:gazelle -- pkg/ tools/ tests/ cmd/
-bazel run \
-    --config=${ARCHITECTURE} \
-    //:goimports
-# allign BAZEL files to a single format
-bazel run \
-    --config=${ARCHITECTURE} \
-    //:buildifier
+ENV container docker
+
+RUN yum install -y bzip2 qemu-img && dnf clean all && mkdir -p /disk
+
+ADD entry-point.sh /
+
+CMD ["/entry-point.sh"]
