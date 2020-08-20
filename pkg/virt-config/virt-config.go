@@ -62,6 +62,7 @@ const (
 	SupportedGuestAgentVersions                     = "3.*,4.*"
 	DefaultARCHOVMFPath                             = "/usr/share/OVMF"
 	DefaultAARCH64OVMFPath                          = "/usr/share/AAVMF"
+	DefaultMemBalloonStatsPeriod                    = 10
 )
 
 // Set default machine type and supported emulated machines based on architecture
